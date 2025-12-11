@@ -4,6 +4,13 @@ import streamlit as st
 
 st.title("ETH ATM Call Options - Delta Exchange")
 
+# Optional input for custom spot price
+user_spot = st.number_input(
+    "Enter your purchased spot price (optional):", 
+    min_value=0.0, 
+    step=1.0, 
+    format="%.2f"
+)
 
 # Function to fetch data
 def fetch_data():
@@ -20,6 +27,13 @@ if st.button("Fetch ETH Call Options"):
         'contract_type', 'spot_price', 'symbol', 'strike_price',
         'greeks.theta', 'quotes.best_bid', 'quotes.best_bid_mm', 'quotes.bid_size'
     ]]
+
+    df['spot_price'] = pd.to_numeric(df['spot_price'], errors='coerce')
+    df['strike_price'] = pd.to_numeric(df['strike_price'], errors='coerce')
+
+    # Override spot price if user provided one
+    if user_spot > 0:
+        df['spot_price'] = user_spot
 
     # Filter call options
     df_calls = df[df['contract_type'] == 'call_options'].copy()
@@ -52,4 +66,4 @@ if st.button("Fetch ETH Call Options"):
 
     # Display table directly
     st.write(f"Last refreshed: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    st.dataframe(df_atm_calls, width='stretch')
+    st.dataframe(df_atm_calls, use_container_width=True)
