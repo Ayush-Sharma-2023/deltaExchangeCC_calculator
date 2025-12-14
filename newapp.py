@@ -50,6 +50,7 @@ if st.button("Fetch ETH Call Options"):
     df_atm_calls['expiry'] = df_atm_calls['expiry_date'].dt.strftime('%d-%m-%Y')
     today = pd.Timestamp.today().normalize()
     df_atm_calls['DTE'] = (df_atm_calls['expiry_date'] - today).dt.days
+    df_atm_calls['DTE'] = df_atm_calls['DTE'] + 1
 
     # Numeric conversion & ROI
     cols_to_numeric = ['quotes.best_bid', 'quotes.best_bid_mm', 'spot_price', 'DTE']
