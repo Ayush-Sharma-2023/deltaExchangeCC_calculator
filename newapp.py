@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 import streamlit as st
+import json
 
 st.title("ETH ATM Call Options - Delta Exchange")
 
@@ -16,6 +17,8 @@ user_spot = st.number_input(
 def fetch_data():
     headers = {'Accept': 'application/json'}
     r = requests.get('https://api.india.delta.exchange/v2/tickers', headers=headers)
+    # with open("data.json", "w") as f:
+    #     json.dump(r.json(), f)
     return r.json()["result"]
 
 # Button to fetch data
@@ -25,7 +28,7 @@ if st.button("Fetch ETH Call Options"):
     df = df[df["underlying_asset_symbol"] == "ETH"]
     df = df[[
         'contract_type', 'spot_price', 'symbol', 'strike_price',
-        'greeks.theta', 'quotes.best_bid', 'quotes.best_bid_mm', 'quotes.bid_size'
+        'greeks.theta', 'quotes.best_bid',  'quotes.bid_size'
     ]]
 
     df['spot_price'] = pd.to_numeric(df['spot_price'], errors='coerce')
@@ -53,9 +56,11 @@ if st.button("Fetch ETH Call Options"):
     df_atm_calls['DTE'] = df_atm_calls['DTE'] + 1
 
     # Numeric conversion & ROI
-    cols_to_numeric = ['quotes.best_bid', 'quotes.best_bid_mm', 'spot_price', 'DTE']
+    # cols_to_numeric = ['quotes.best_bid', 'quotes.best_bid_mm', 'spot_price', 'DTE']
+    cols_to_numeric = ['quotes.best_bid', 'spot_price', 'DTE']
     df_atm_calls[cols_to_numeric] = df_atm_calls[cols_to_numeric].apply(pd.to_numeric, errors='coerce')
-    df_atm_calls['best_bid'] = df_atm_calls[['quotes.best_bid', 'quotes.best_bid_mm']].min(axis=1)
+    # df_atm_calls['best_bid'] = df_atm_calls[['quotes.best_bid', 'quotes.best_bid_mm']].min(axis=1)
+    df_atm_calls['best_bid'] = df_atm_calls['quotes.best_bid']
 
     df_atm_calls['ROI'] = (df_atm_calls['best_bid'] / df_atm_calls['spot_price']) * 100
     df_atm_calls['ROI_annual'] = (df_atm_calls['best_bid'] / df_atm_calls['spot_price']) * (365 / df_atm_calls['DTE']) * 100
