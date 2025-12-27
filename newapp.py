@@ -51,6 +51,8 @@ if st.button("Fetch ETH Call Options"):
     # Expiry date and DTE
     df_atm_calls['expiry_date'] = pd.to_datetime(df_atm_calls['expiry'], format='%d%m%y')
     df_atm_calls['expiry'] = df_atm_calls['expiry_date'].dt.strftime('%d-%m-%Y')
+    # df_atm_calls['expiry_date'] = df_atm_calls['expiry_date'].dt.date
+
     today = pd.Timestamp.today().normalize()
     df_atm_calls['DTE'] = (df_atm_calls['expiry_date'] - today).dt.days
     df_atm_calls['DTE'] = df_atm_calls['DTE'] + 1
@@ -67,7 +69,8 @@ if st.button("Fetch ETH Call Options"):
 
     df_atm_calls = df_atm_calls[[
         'spot_price', 'strike_price','best_bid',  'quotes.bid_size',
-        'expiry_date', 'DTE','ROI_annual', 'ROI'
+        # 'expiry_date', 'DTE','ROI_annual', 'ROI'
+        'expiry', 'DTE','ROI_annual', 'ROI'
     ]]
 
     # Display table directly
