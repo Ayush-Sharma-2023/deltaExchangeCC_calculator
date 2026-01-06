@@ -22,7 +22,7 @@ btc_spot = st.number_input(
 )
 
 # Fetch data ONLY ONCE
-@st.cache_data(show_spinner=False)
+# @st.cache_data(show_spinner=False)
 def fetch_data():
     headers = {"Accept": "application/json"}
     r = requests.get("https://api.india.delta.exchange/v2/tickers", headers=headers)
