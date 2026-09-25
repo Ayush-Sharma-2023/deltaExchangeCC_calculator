@@ -6,7 +6,7 @@ st.title("ETH & BTC ATM Call Options - Delta Exchange")
 
 # Separate spot inputs
 eth_spot = st.number_input(
-    "Enter your ETH purchased spot price (optional) ETH TEST:",
+    "Enter your ETH purchased spot price (optional):",
     min_value=0.0,
     step=1.0,
     format="%.2f",
