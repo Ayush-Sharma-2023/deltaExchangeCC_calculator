@@ -21,6 +21,14 @@ btc_spot = st.number_input(
     key="btc_spot"
 )
 
+xaut_spot = st.number_input(
+    "Enter your XAUT purchased spot price (optional):",
+    min_value=0.0,
+    step=1.0,
+    format="%.2f",
+    key="xaut_spot"
+)
+
 # Fetch data ONLY ONCE
 # @st.cache_data(show_spinner=False)
 def fetch_data():
@@ -104,6 +112,11 @@ if st.button("Fetch ETH & BTC Call Options"):
     st.subheader("BTC ATM Call Options")
     df_btc = process_asset(df, "BTC", btc_spot)
     st.dataframe(df_btc, use_container_width=True)
+    
+    # XAUT table
+    st.subheader("XAUTUSD ATM Call Options")
+    df_xaut = process_asset(df, "XAUT", xaut_spot)
+    st.dataframe(df_xaut, use_container_width=True)
 
     st.caption(
         f"Last refreshed: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}"
