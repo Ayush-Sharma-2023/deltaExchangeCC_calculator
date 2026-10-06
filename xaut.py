@@ -53,7 +53,7 @@ with col1:
     entry_price = st.number_input(
         "Entry",
         min_value=0.0,
-        value=0.0,
+        value=4196,
         step=1.0,
         format="%.2f"
     )
@@ -63,7 +63,7 @@ with col2:
     lot_size = st.number_input(
         "Lot Size",
         min_value=0.01,
-        value=1.0,
+        value=0.2,
         step=0.01,
         format="%.2f"
     )
