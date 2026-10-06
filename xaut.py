@@ -279,10 +279,16 @@ if st.button(
             ["Expiry", "Strike Price"]
         )
 
+        # otm = otm.sort_values(
+        #     ["Expiry", "Strike Price"],
+        #     ascending=[True, False]
+        # )
+        
         otm = otm.sort_values(
-            ["Expiry", "Strike Price"],
-            ascending=[True, False]
-        )
+    "Profit from Premium",
+    ascending=False
+)
+
 
         # =================================================
         # RESULTS
