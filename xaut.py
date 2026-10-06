@@ -53,7 +53,7 @@ with col1:
     entry_price = st.number_input(
         "Entry",
         min_value=0.0,
-        value=4196,
+        value=4196.0,
         step=1.0,
         format="%.2f"
     )
