@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 import streamlit as st
+import plotly.express as px
 
 
 # =========================================================
@@ -288,6 +289,69 @@ if st.button(
     "Profit from Premium",
     ascending=False
 )
+
+
+
+
+        # =========================================================
+        # PREMIUM vs ASSIGNMENT — SINGLE CONNECTED XY PLOT
+        # =========================================================
+
+        st.divider()
+        st.subheader("Premium vs Assignment Profit")
+
+        if not otm.empty:
+
+            plot_df = otm.copy()
+
+            # Sort by X-axis value so points connect left to right
+            plot_df = plot_df.sort_values(
+                "Profit from Premium"
+            )
+
+            fig = px.line(
+                plot_df,
+                x="Profit from Premium",
+                y="Profit from Assignment",
+                markers=True,
+                hover_data=[
+                    "Expiry",
+                    "Strike Price",
+                    "LTP",
+                    "Total Profit"
+                ],
+                title="Premium Profit vs Assignment Profit",
+                labels={
+                    "Profit from Premium": "Profit from Premium ($)",
+                    "Profit from Assignment": "Profit from Assignment ($)"
+                }
+            )
+
+            fig.update_traces(
+                mode="lines+markers",
+                marker=dict(size=7),
+                line=dict(width=2)
+            )
+
+            fig.update_layout(
+                xaxis_title="Profit from Premium ($)",
+                yaxis_title="Profit from Assignment ($)",
+                hovermode="closest"
+            )
+
+            st.plotly_chart(
+                fig,
+                use_container_width=True
+            )
+
+        else:
+            st.warning("No OTM put options available to plot.")
+        
+
+            
+        
+        
+        
 
 
         # =================================================
