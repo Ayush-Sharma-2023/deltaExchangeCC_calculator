@@ -293,8 +293,30 @@ if st.button(
 
 
 
+        # =================================================
+        # RESULTS
+        # =================================================
+
+        st.divider()
+
+#         st.subheader("ITM Put Options")
+# 
+#         st.dataframe(
+#             itm,
+#             use_container_width=True,
+#             hide_index=True
+#         )
+
+        st.subheader("OTM Put Options")
+
+        st.dataframe(
+            otm,
+            use_container_width=True,
+            hide_index=True
+        )
+
         # =========================================================
-        # PREMIUM vs ASSIGNMENT — SINGLE CONNECTED XY PLOT
+        # PREMIUM vs ASSIGNMENT - SINGLE CONNECTED XY PLOT
         # =========================================================
 
         st.divider()
@@ -346,35 +368,6 @@ if st.button(
 
         else:
             st.warning("No OTM put options available to plot.")
-        
-
-            
-        
-        
-        
-
-
-        # =================================================
-        # RESULTS
-        # =================================================
-
-        st.divider()
-
-#         st.subheader("ITM Put Options")
-# 
-#         st.dataframe(
-#             itm,
-#             use_container_width=True,
-#             hide_index=True
-#         )
-
-        st.subheader("OTM Put Options")
-
-        st.dataframe(
-            otm,
-            use_container_width=True,
-            hide_index=True
-        )
 
         # =================================================
         # REFRESH TIME
