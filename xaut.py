@@ -254,13 +254,23 @@ if st.button(
     (option_expiry - pd.Timestamp.now().date()).days,
     0
 )
+        
+        breakeven = (
+    option_strike - option_entry
+    if option_type == "Put" and option_side == "Sold"
+    else option_strike + option_entry
+    if option_type == "Call" and option_side == "Sold"
+    else option_strike + option_entry
+    if option_type == "Put" and option_side == "Bought"
+    else option_strike - option_entry
+)
 
         cards = [
             ("Expiry", option_expiry.strftime("%d-%m-%Y")),
             ("Strike", f"${option_strike:,.2f}"),
             ("Entry", f"${option_entry:,.2f}"),
-            ("DTE", f"{dte} days"),
-            
+            # ("DTE", f"{dte} days"),
+            ("Breakeven", f"${breakeven:,.2f}"),
             ("Closing Price (Position)", f"${position_value:,.2f}"),
             ("Intrinsic", f"${intrinsic:,.2f}"),
             ("Time Value", f"${time_value:,.2f}"),
