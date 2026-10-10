@@ -71,6 +71,63 @@ with col2:
 
 
 # =========================================================
+# OPTION POSITION INPUTS
+# =========================================================
+
+st.subheader("Analyze Option Position")
+
+opt1, opt2, opt3 = st.columns(3)
+
+with opt1:
+    option_expiry = st.date_input(
+        "Expiry Date",
+        value=pd.Timestamp("2026-10-16").date(),
+        key="option_expiry"
+    )
+
+with opt2:
+    option_type = st.selectbox(
+        "Call / Put",
+        ["Put", "Call"],
+        key="option_type"
+    )
+
+with opt3:
+    option_side = st.selectbox(
+        "Bought / Sold",
+        ["Sold", "Bought"],
+        key="option_side"
+    )
+
+opt1, opt2, opt3 = st.columns(3)
+
+with opt1:
+    option_strike = st.number_input(
+        "Strike Price",
+        min_value=0.01,
+        value=4180.0,
+        step=10.0,
+        key="option_strike"
+    )
+
+with opt2:
+    option_entry = st.number_input(
+        "Option Entry Premium",
+        min_value=0.0,
+        value=39.9,
+        step=1.0,
+        key="option_entry"
+    )
+
+with opt3:
+    option_lot = st.number_input(
+        "Option Lot Size",
+        min_value=0.01,
+        value=0.2,
+        step=0.01,
+        key="option_lot"
+    )
+# =========================================================
 # FETCH BUTTON
 # =========================================================
 
@@ -102,7 +159,123 @@ if st.button(
 
         # Get current XAUT spot
         spot_price = df["spot_price"].dropna().iloc[0]
+        
+                # =========================================================
+        # OPTION POSITION ANALYSIS
+        # =========================================================
 
+        st.divider()
+        st.subheader("Option Position Analysis")
+
+        contract_type = (
+            "put_options" if option_type == "Put"
+            else "call_options"
+        )
+
+        expiry_string = option_expiry.strftime("%d%m%y")
+
+        matches = df[
+            (df["contract_type"] == contract_type)
+            & (df["symbol"].str.endswith("-" + expiry_string))
+            & (
+                pd.to_numeric(
+                    df["strike_price"], errors="coerce"
+                ) == option_strike
+            )
+        ].copy()
+
+        if matches.empty:
+            st.warning("No matching option contract found.")
+        else:
+            contract = matches.iloc[0]
+
+            bid = pd.to_numeric(
+                contract.get("quotes.best_bid"), errors="coerce"
+            )
+            ask = pd.to_numeric(
+                contract.get("quotes.best_ask"), errors="coerce"
+            )
+
+            # Estimate current executable price
+            market_price = ask if option_side == "Sold" else bid
+
+            if pd.isna(market_price) or market_price <= 0:
+                st.warning("No valid market quote for this option.")
+            else:
+                # Per-unit intrinsic value
+                if option_type == "Call":
+                    intrinsic_per_unit = max(spot_price - option_strike, 0)
+                else:
+                    intrinsic_per_unit = max(option_strike - spot_price, 0)
+
+                # Per-unit time value
+                time_value_per_unit = max(
+                    float(market_price) - intrinsic_per_unit, 0
+                )
+
+                # Values for your entire position
+                intrinsic = intrinsic_per_unit * option_lot
+                time_value = time_value_per_unit * option_lot
+                position_value = float(market_price) * option_lot
+
+                # Unrealized P&L: use per-unit market price
+                if option_side == "Bought":
+                    pnl = (float(market_price) - option_entry) * option_lot
+                else:
+                    pnl = (option_entry - float(market_price)) * option_lot
+
+                analysis = pd.DataFrame([{
+        "Expiry": option_expiry.strftime("%d-%m-%Y"),
+        # "Type": option_type,
+        # "Side": option_side,
+        "Strike": option_strike,
+        "Entry": option_entry,
+        # "Lot": option_lot,
+        # "Best Bid": bid,
+        # "Best Ask": ask,
+        # "Selected Price": market_price,
+        "Selected Price (Position)": position_value,
+        "Intrinsic Value": intrinsic,
+        "Time Value": time_value,
+        "Unrealized P&L": pnl
+    }])
+
+                # st.dataframe(
+                #     analysis,
+                #     use_container_width=True,
+                #     hide_index=True
+                # )
+                # =========================================================
+# OPTION POSITION ANALYSIS - CARDS
+# =========================================================
+
+        # st.subheader("Option Position Analysis")
+        dte = max(
+    (option_expiry - pd.Timestamp.now().date()).days,
+    0
+)
+
+        cards = [
+            ("Expiry", option_expiry.strftime("%d-%m-%Y")),
+            ("Strike", f"${option_strike:,.2f}"),
+            ("Entry", f"${option_entry:,.2f}"),
+            ("DTE", f"{dte} days"),
+            
+            ("Closing Price (Position)", f"${position_value:,.2f}"),
+            ("Intrinsic", f"${intrinsic:,.2f}"),
+            ("Time Value", f"${time_value:,.2f}"),
+            ("Unrealized P&L", f"${pnl:,.2f}"),
+        ]
+
+      # Display 4 cards in each row
+        for start in range(0, len(cards), 4):
+            cols = st.columns(4)
+
+            for col, (label, value) in zip(
+                cols, cards[start:start + 4]
+            ):
+                with col:
+                    st.metric(label=label, value=value)
         # -------------------------------------------------
         # DISPLAY SPOT
         # -------------------------------------------------
