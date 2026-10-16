@@ -81,7 +81,7 @@ opt1, opt2, opt3 = st.columns(3)
 with opt1:
     option_expiry = st.date_input(
         "Expiry Date",
-        value=pd.Timestamp("2026-10-16").date(),
+        value=pd.Timestamp("2026-10-23").date(),
         key="option_expiry"
     )
 
