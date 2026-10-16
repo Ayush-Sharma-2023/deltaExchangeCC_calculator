@@ -54,7 +54,7 @@ with col1:
     entry_price = st.number_input(
         "Entry",
         min_value=0.0,
-        value=4196.0,
+        value=4191.0,
         step=1.0,
         format="%.2f"
     )
@@ -64,7 +64,7 @@ with col2:
     lot_size = st.number_input(
         "Lot Size",
         min_value=0.01,
-        value=0.2,
+        value=0.25,
         step=0.01,
         format="%.2f"
     )
@@ -105,7 +105,7 @@ with opt1:
     option_strike = st.number_input(
         "Strike Price",
         min_value=0.01,
-        value=4180.0,
+        value=4160.0,
         step=10.0,
         key="option_strike"
     )
@@ -114,7 +114,7 @@ with opt2:
     option_entry = st.number_input(
         "Option Entry Premium",
         min_value=0.0,
-        value=39.9,
+        value=32.6,
         step=1.0,
         key="option_entry"
     )
@@ -123,7 +123,7 @@ with opt3:
     option_lot = st.number_input(
         "Option Lot Size",
         min_value=0.01,
-        value=0.2,
+        value=0.25,
         step=0.01,
         key="option_lot"
     )
