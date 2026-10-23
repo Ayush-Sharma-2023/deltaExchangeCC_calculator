@@ -8,6 +8,14 @@ import plotly.express as px
 # PAGE CONFIG
 # =========================================================
 
+spotEntry = 4009.0
+spotlot = 0.25
+
+expdate = "2026-10-30"
+option_strike = 4160.0
+option_entry = 41.5
+option_lot = 0.25
+
 
 st.set_page_config(
     page_title="XAUT Put Analyzer",
@@ -50,12 +58,13 @@ def fetch_xaut_data():
 
 col1, col2 = st.columns(2)
 
+
 with col1:
 
     entry_price = st.number_input(
         "Entry",
         min_value=0.0,
-        value=4009.0,
+        value=spotEntry,
         step=1.0,
         format="%.2f"
     )
@@ -65,7 +74,7 @@ with col2:
     lot_size = st.number_input(
         "Lot Size",
         min_value=0.01,
-        value=0.25,
+        value=spotlot,
         step=0.01,
         format="%.2f"
     )
@@ -79,10 +88,12 @@ st.subheader("Analyze Option Position")
 
 opt1, opt2, opt3 = st.columns(3)
 
+
+
 with opt1:
     option_expiry = st.date_input(
         "Expiry Date",
-        value=pd.Timestamp("2026-10-30").date(),
+        value=pd.Timestamp(expdate).date(),
         key="option_expiry"
     )
 
@@ -106,7 +117,7 @@ with opt1:
     option_strike = st.number_input(
         "Strike Price",
         min_value=0.01,
-        value=4160.0,
+        value=option_strike,
         step=10.0,
         key="option_strike"
     )
@@ -115,7 +126,7 @@ with opt2:
     option_entry = st.number_input(
         "Option Entry Premium",
         min_value=0.0,
-        value=41.5,
+        value=option_entry,
         step=1.0,
         key="option_entry"
     )
@@ -124,7 +135,7 @@ with opt3:
     option_lot = st.number_input(
         "Option Lot Size",
         min_value=0.01,
-        value=0.25,
+        value=option_lot,
         step=0.01,
         key="option_lot"
     )
