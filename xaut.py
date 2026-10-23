@@ -8,6 +8,7 @@ import plotly.express as px
 # PAGE CONFIG
 # =========================================================
 
+
 st.set_page_config(
     page_title="XAUT Put Analyzer",
     layout="wide"
@@ -54,7 +55,7 @@ with col1:
     entry_price = st.number_input(
         "Entry",
         min_value=0.0,
-        value=4191.0,
+        value=4009.0,
         step=1.0,
         format="%.2f"
     )
@@ -81,7 +82,7 @@ opt1, opt2, opt3 = st.columns(3)
 with opt1:
     option_expiry = st.date_input(
         "Expiry Date",
-        value=pd.Timestamp("2026-10-23").date(),
+        value=pd.Timestamp("2026-10-30").date(),
         key="option_expiry"
     )
 
@@ -114,7 +115,7 @@ with opt2:
     option_entry = st.number_input(
         "Option Entry Premium",
         min_value=0.0,
-        value=32.6,
+        value=41.5,
         step=1.0,
         key="option_entry"
     )
