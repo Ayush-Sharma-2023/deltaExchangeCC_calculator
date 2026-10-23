@@ -12,7 +12,7 @@ spotEntry = 4009.0
 spotlot = 0.25
 
 expdate = "2026-10-30"
-option_strike = 4160.0
+option_strike = 4000.0
 option_entry = 41.5
 option_lot = 0.25
 
