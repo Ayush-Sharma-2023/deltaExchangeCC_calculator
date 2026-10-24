@@ -8,7 +8,7 @@ import plotly.express as px
 # PAGE CONFIG
 # =========================================================
 
-spotEntry = 4009.0
+spotEntry = 4009.28
 spotlot = 0.25
 
 expdate = "2026-10-30"
@@ -168,10 +168,91 @@ if st.button(
             df["spot_price"],
             errors="coerce"
         )
+        df["mark_price"] = pd.to_numeric(
+            df["mark_price"],
+            errors="coerce"
+        )
 
         # Get current XAUT spot
         spot_price = df["spot_price"].dropna().iloc[0]
+        mark_price = df["mark_price"].dropna().iloc[0]
         
+                
+            # =========================================================
+        # ATM CALL + PUT PREMIUM — SAME EXPIRY
+        # =========================================================
+
+        expiry_string = option_expiry.strftime("%d%m%y")
+
+        options = df[
+            (df["underlying_asset_symbol"] == "XAUT")
+            & (df["contract_type"].isin(["call_options", "put_options"]))
+            & (df["symbol"].str.endswith("-" + expiry_string))
+        ].copy()
+
+        options["strike_price"] = pd.to_numeric(
+            options["strike_price"], errors="coerce"
+        )
+
+        options["mark_price"] = pd.to_numeric(
+            options["mark_price"], errors="coerce"
+        )
+
+        options["quotes.best_bid"] = pd.to_numeric(
+            options["quotes.best_bid"], errors="coerce"
+        )
+
+        options["quotes.best_ask"] = pd.to_numeric(
+            options["quotes.best_ask"], errors="coerce"
+        )
+
+        if not options.empty:
+            strikes = options["strike_price"].dropna().unique()
+
+            if len(strikes):
+                atm_strike = min(strikes, key=lambda x: abs(x - spot_price))
+
+                atm_options = options[
+                    options["strike_price"] == atm_strike
+                ]
+
+                def get_atm_price(contract_type):
+                    contracts = atm_options[
+                        atm_options["contract_type"] == contract_type
+                    ]
+
+                    if contracts.empty:
+                        return None
+
+                    contract = contracts.iloc[0]
+                    bid = contract["quotes.best_bid"]
+                    ask = contract["quotes.best_ask"]
+
+                    # Prefer midpoint if both sides have valid quotes
+                    if pd.notna(bid) and pd.notna(ask) and bid > 0 and ask > 0:
+                        return (bid + ask) / 2
+
+                    # Fallback to exchange mark price
+                    mark = contract["mark_price"]
+                    if pd.notna(mark) and mark > 0:
+                        return float(mark)
+
+                    return None
+
+                atm_call_premium = get_atm_price("call_options")
+                atm_put_premium = get_atm_price("put_options")
+
+                atm_value = (
+                    atm_call_premium + atm_put_premium
+                    if atm_call_premium is not None
+                    and atm_put_premium is not None
+                    else None
+                )
+            else:
+                atm_call_premium = atm_put_premium = atm_value = None
+        else:
+            atm_call_premium = atm_put_premium = atm_value = None
+            
                 # =========================================================
         # OPTION POSITION ANALYSIS
         # =========================================================
@@ -235,6 +316,11 @@ if st.button(
                     pnl = (float(market_price) - option_entry) * option_lot
                 else:
                     pnl = (option_entry - float(market_price)) * option_lot
+                                # =========================================================
+                # XAUT SPOT UPNL
+                # =========================================================
+
+                upnl = (entry_price - mark_price) * lot_size
 
                 analysis = pd.DataFrame([{
         "Expiry": option_expiry.strftime("%d-%m-%Y"),
@@ -278,15 +364,26 @@ if st.button(
 )
 
         cards = [
+            ("Unrealized P&L", f"${pnl:,.2f}"),
+            ("Intrinsic", f"${intrinsic:,.2f}"),
+            ("Time Value", f"${time_value:,.2f}"),
+            ("Closing Price (Position)", f"${position_value:,.2f}"),
+            
+            ("ATM Strike Price", f"${atm_strike:,.2f}"),
+            ("ATM Value", f"${atm_value:,.2f}" if atm_value is not None else "N/A"),
+            ("ATM Call Price", f"${atm_call_premium:,.2f}" if atm_call_premium is not None else "N/A"),
+            ("ATM Put Price",f"${atm_put_premium:,.2f}" if atm_put_premium is not None else "N/A"),
+            
             ("Expiry", option_expiry.strftime("%d-%m-%Y")),
             ("Strike", f"${option_strike:,.2f}"),
             ("Entry", f"${option_entry:,.2f}"),
             # ("DTE", f"{dte} days"),
             ("Breakeven", f"${breakeven:,.2f}"),
-            ("Closing Price (Position)", f"${position_value:,.2f}"),
-            ("Intrinsic", f"${intrinsic:,.2f}"),
-            ("Time Value", f"${time_value:,.2f}"),
-            ("Unrealized P&L", f"${pnl:,.2f}"),
+            
+            
+            
+            
+            
         ]
 
       # Display 4 cards in each row
@@ -304,13 +401,13 @@ if st.button(
 
         st.divider()
 
-        spot_col1, spot_col2, spot_col3 = st.columns(3)
+        spot_col1, spot_col2, spot_col3 , spot_col4 = st.columns(4)
 
         with spot_col1:
 
             st.metric(
-                label="XAUT Spot Price",
-                value=f"${spot_price:,.2f}"
+                label="XAUT Mark Price",
+                value=f"${mark_price:,.2f}"
             )
 
         with spot_col2:
@@ -325,6 +422,12 @@ if st.button(
             st.metric(
                 label="Lot Size",
                 value=f"{lot_size:g}"
+            )
+        with spot_col4:
+            st.metric(
+                label="Spot UPNL",
+                value=f"${upnl:,.2f}",
+                delta=f"${upnl:,.2f}"
             )
 
         # -------------------------------------------------
