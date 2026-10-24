@@ -335,6 +335,7 @@ if st.button(
         "Selected Price (Position)": position_value,
         "Intrinsic Value": intrinsic,
         "Time Value": time_value,
+        
         "Unrealized P&L": pnl
     }])
 
@@ -390,11 +391,20 @@ if st.button(
         for start in range(0, len(cards), 4):
             cols = st.columns(4)
 
-            for col, (label, value) in zip(
-                cols, cards[start:start + 4]
-            ):
+            for col, (label, value) in zip(cols, cards[start:start + 4]):
                 with col:
-                    st.metric(label=label, value=value)
+                    if label == "Unrealized P&L":
+                        st.metric(
+                            label=label,
+                            # value=f"${pnl:,.2f}",
+                            value=f"",
+                                delta=f"{pnl:+,.2f}",
+
+                            
+
+                        )
+                    else:
+                        st.metric(label=label, value=value)
         # -------------------------------------------------
         # DISPLAY SPOT
         # -------------------------------------------------
@@ -426,8 +436,12 @@ if st.button(
         with spot_col4:
             st.metric(
                 label="Spot UPNL",
-                value=f"${upnl:,.2f}",
-                delta=f"${upnl:,.2f}"
+                delta=f"{upnl:+,.2f}",
+                # value=f"${upnl:,.2f}",
+                value=f"",
+                
+                
+
             )
 
         # -------------------------------------------------
