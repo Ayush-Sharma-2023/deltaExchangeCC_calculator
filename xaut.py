@@ -8,13 +8,13 @@ import plotly.express as px
 # PAGE CONFIG
 # =========================================================
 
-spotEntry = 3943.93
-spotlot = 0.175
+spotEntry = 3880.0
+spotlot = 0.100
 
-expdate = "2026-11-13"
-option_strike = 3960.0
-option_entry = 20.80
-option_lot = 0.175
+expdate = "2026-11-20"
+option_strike = 3900.0
+option_entry = 53.6
+option_lot = 0.095
 
 
 st.set_page_config(
